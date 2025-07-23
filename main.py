@@ -6,21 +6,21 @@ import os
 from datetime import datetime
 import time
 
-# --- CONFIGURATION ---
+
 BOT_TOKEN = '8037950501:AAFZGTIhG6WKafogoblSvMOUYSFn0zACBJU'
 CHAT_ID = '1282149880'
 CONFIDENCE_THRESHOLD = 0.3
-TELEGRAM_INTERVAL = 30  # seconds between alerts
-MODEL_PATH = 'yolov8n.pt'  # Change to your trained model if needed
+TELEGRAM_INTERVAL = 30  
+MODEL_PATH = 'yolov8n.pt'  
 
-# Threat classes to detect (excluding normal person)
+
 THREAT_CLASSES = ['cell phone', 'knife', 'gun', 'masked', 'crawling']
 
-# --- INITIAL SETUP ---
+
 model = YOLO(MODEL_PATH)
 last_alert_time = 0
 
-# Telegram image sending function
+
 def send_telegram_image(image_path, detected_class):
     print("[INFO] Sending image via Telegram...")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -39,14 +39,14 @@ def send_telegram_image(image_path, detected_class):
     else:
         print("[❌] Telegram error:", response.text)
 
-# --- SIREN SOUND FUNCTION ---
+
 def play_siren():
-    for _ in range(3):  # Play siren pattern 3 times
+    for _ in range(3):  
         winsound.Beep(1000, 200)
         winsound.Beep(1500, 200)
         winsound.Beep(2000, 300)
 
-# --- START CCTV CAMERA ---
+
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -78,23 +78,22 @@ while True:
                 cv2.putText(frame, f"{class_name} {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-    # Send alert if threat detected
     current_time = time.time()
     if detected and (current_time - last_alert_time) > TELEGRAM_INTERVAL:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"threat_{detected_class}_{timestamp}.jpg"
         cv2.imwrite(filename, frame)
 
-        # 🔊 Play siren sound
+        
         play_siren()
 
-        # 📤 Send image via Telegram
+        
         send_telegram_image(filename, detected_class)
 
-        os.remove(filename)  # Cleanup
+        os.remove(filename)  
         last_alert_time = current_time
 
-    # Display feed
+    
     cv2.imshow("📹 AI CCTV Detector", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
