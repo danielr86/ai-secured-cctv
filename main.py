@@ -71,7 +71,7 @@ while True:
                 detected_class = class_name
                 print(f"[⚠️ DETECTED] {class_name} ({conf:.2f})")
 
-                # Draw bounding box
+                
                 xyxy = box.xyxy[0].cpu().numpy().astype(int)
                 x1, y1, x2, y2 = xyxy
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
